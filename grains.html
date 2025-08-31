@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康食品指南 - 五谷</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4CAF50',
+                        secondary: '#FF9800',
+                        accent: '#2196F3',
+                        neutral: '#f5f5f5',
+                        dark: '#333333'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-dark">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-md fixed w-full z-10 transition-all duration-300" id="navbar">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="index.html" class="flex items-center space-x-2">
+                <i class="fa fa-leaf text-primary text-2xl"></i>
+                <span class="font-bold text-xl text-primary">健康食品指南</span>
+            </a>
+            
+            <!-- 桌面导航 -->
+            <div class="hidden md:flex space-x-6">
+                <a href="index.html" class="font-medium text-gray-600 hover:text-primary transition-colors">首页</a>
+                <a href="vegetarian-protein.html" class="font-medium text-gray-600 hover:text-primary transition-colors">素食蛋白</a>
+                <a href="fruits.html" class="font-medium text-gray-600 hover:text-primary transition-colors">水果</a>
+                <a href="grains.html" class="font-medium text-primary hover:text-primary/80 transition-colors">五谷</a>
+                <a href="vegetables.html" class="font-medium text-gray-600 hover:text-primary transition-colors">蔬菜</a>
+            </div>
+            
+            <!-- 移动端菜单按钮 -->
+            <button class="md:hidden text-gray-600 focus:outline-none" id="menuBtn">
+                <i class="fa fa-bars text-xl"></i>
+            </button>
+        </div>
+        
+        <!-- 移动端导航菜单 -->
+        <div class="md:hidden hidden bg-white shadow-lg absolute w-full" id="mobileMenu">
+            <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
+                <a href="index.html" class="py-2 font-medium text-gray-600 hover:bg-gray-50 hover:text-primary px-2 rounded transition-colors">首页</a>
+                <a href="vegetarian-protein.html" class="py-2 font-medium text-gray-600 hover:bg-gray-50 hover:text-primary px-2 rounded transition-colors">素食蛋白</a>
+                <a href="fruits.html" class="py-2 font-medium text-gray-600 hover:bg-gray-50 hover:text-primary px-2 rounded transition-colors">水果</a>
+                <a href="grains.html" class="py-2 font-medium text-primary hover:bg-gray-50 px-2 rounded transition-colors">五谷</a>
+                <a href="vegetables.html" class="py-2 font-medium text-gray-600 hover:bg-gray-50 hover:text-primary px-2 rounded transition-colors">蔬菜</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主横幅 -->
+    <header class="pt-24 pb-16 bg-gradient-to-br from-amber-700/90 to-amber-800 text-white">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-8 md:mb-0">
+                    <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold mb-4 text-shadow">五谷</h1>
+                    <p class="text-[clamp(1rem,2vw,1.25rem)] opacity-90">五谷是指五种谷物，是人类饮食的基础，提供能量和多种重要营养素。全谷物保留了麸皮、胚芽和胚乳，比精制谷物含有更多的纤维、维生素和矿物质。</p>
+                </div>
+                <div class="md:w-1/2">
+                    <img src="https://images.unsplash.com/photo-1621956838481-f8f616950454?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="各种五谷杂粮" class="rounded-xl shadow-lg w-full max-w-lg mx-auto transform rotate-2 hover:rotate-0 transition-transform duration-300">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="py-16">
+        <div class="container mx-auto px-4">
+            <!-- 营养成分对比图表 -->
+            <section class="mb-16 bg-white rounded-2xl shadow-md p-6 md:p-8">
+                <h2 class="text-2xl font-bold mb-6 text-center">五谷膳食纤维含量对比 (每100克熟重)</h2>
+                <div class="h-80">
+                    <canvas id="grainChart"></canvas>
+                </div>
+            </section>
+            
+            <!-- 五谷列表 -->
+            <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-center mb-12 text-dark">营养丰富的五谷</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- 燕麦 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover">
+                    <div class="h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1614373532018-92a75430a0da?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="燕麦" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-3">
+                            <i class="fa fa-seedling text-amber-700 text-xl mr-2"></i>
+                            <h3 class="text-xl font-bold text-dark">燕麦</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">燕麦是一种营养丰富的全谷物，以其独特的可溶性纤维含量而闻名。它们可以制成燕麦片、燕麦粥，也可添加到烘焙食品中。</p>
+                        
+                        <h4 class="font-bold text-lg mb-2 text-primary">营养成分 (熟)</h4>
+                        <ul class="space-y-1 text-gray-600 mb-4">
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>膳食纤维: 4克 (其中1.9克为可溶性纤维)</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>蛋白质: 5克</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>卡路里: 150</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>富含锰、镁、磷和维生素B群</li>
+                        </ul>
+                        
+                        <div class="bg-neutral p-3 rounded-lg">
+                            <p class="text-sm text-gray-700"><i class="fa fa-lightbulb-o text-secondary mr-2"></i>健康益处: 降低LDL("坏")胆固醇，有助于控制血糖，提供持久能量，促进饱腹感。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 糙米 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover">
+                    <div class="h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1613728913341-8f29b02b8253?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="糙米" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-3">
+                            <i class="fa fa-seedling text-amber-700 text-xl mr-2"></i>
+                            <h3 class="text-xl font-bold text-dark">糙米</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">糙米是去除外壳但保留麸皮和胚芽的稻米，比白米更有营养。它具有坚果般的口感和淡淡的坚果香味。</p>
+                        
+                        <h4 class="font-bold text-lg mb-2 text-primary">营养成分 (熟)</h4>
+                        <ul class="space-y-1 text-gray-600 mb-4">
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>膳食纤维: 2.8克</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>蛋白质: 2.6克</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>卡路里: 111</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>富含锰、镁、硒和B族维生素</li>
+                        </ul>
+                        
+                        <div class="bg-neutral p-3 rounded-lg">
+                            <p class="text-sm text-gray-700"><i class="fa fa-lightbulb-o text-secondary mr-2"></i>健康益处: 支持心脏健康，有助于体重管理，促进消化健康，提供持久能量。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 藜麦 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover">
+                    <div class="h-56 overflow-hidden">
+                        <img src="https://plus.unsplash.com/premium_photo-1671130295828-efd9019faee0?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="藜麦" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-3">
+                            <i class="fa fa-seedling text-amber-700 text-xl mr-2"></i>
+                            <h3 class="text-xl font-bold text-dark">藜麦</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">藜麦虽然常被当作谷物，但实际上是一种伪谷物。它是唯一含有全部九种必需氨基酸的植物性食物，是优质蛋白质的重要来源。</p>
+                        
+                        <h4 class="font-bold text-lg mb-2 text-primary">营养成分 (熟)</h4>
+                        <ul class="space-y-1 text-gray-600 mb-4">
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>膳食纤维: 2.8克</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>蛋白质: 4.4克</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>卡路里: 120</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>富含铁、镁、锌和维生素E</li>
+                        </ul>
+                        
+                        <div class="bg-neutral p-3 rounded-lg">
+                            <p class="text-sm text-gray-700"><i class="fa fa-lightbulb-o text-secondary mr-2"></i>健康益处: 适合麸质不耐受人群，支持肌肉生长，有助于控制血糖，促进心脏健康。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 小米 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover">
+                    <div class="h-56 overflow-hidden">
+                        <img src="https://media.istockphoto.com/id/1445727438/zh/%E7%85%A7%E7%89%87/millet-and-wood-spoon.jpg?s=1024x1024&w=is&k=20&c=5LMUvYFKd9OvoTDOJKOdWIt5pHCO6GHEUPrL09aE1EY=" alt="小米" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-3">
+                            <i class="fa fa-seedling text-amber-700 text-xl mr-2"></i>
+                            <h3 class="text-xl font-bold text-dark">小米</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">小米是世界上最古老的栽培谷物之一，在中国、印度和非洲有着悠久的种植历史。它口感轻盈，易于消化，适合各类人群食用。</p>
+                        
+                        <h4 class="font-bold text-lg mb-2 text-primary">营养成分 (熟)</h4>
+                        <ul class="space-y-1 text-gray-600 mb-4">
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>膳食纤维: 2.2克</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>蛋白质: 4.8克</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>卡路里: 114</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>富含镁、磷、 manganese和B族维生素</li>
+                        </ul>
+                        
+                        <div class="bg-neutral p-3 rounded-lg">
+                            <p class="text-sm text-gray-700"><i class="fa fa-lightbulb-o text-secondary mr-2"></i>健康益处: 易于消化，适合肠胃敏感人群，有助于维持健康血糖水平，支持神经系统功能。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 荞麦 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover">
+                    <div class="h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1613758235306-69cc0a3f614d?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="荞麦" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-3">
+                            <i class="fa fa-seedling text-amber-700 text-xl mr-2"></i>
+                            <h3 class="text-xl font-bold text-dark">荞麦</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">荞麦虽然名称中有"麦"字，但实际上是蓼科植物的种子，不是真正的谷物。它不含麸质，是 gluten不耐受人群的理想选择。</p>
+                        
+                        <h4 class="font-bold text-lg mb-2 text-primary">营养成分 (熟)</h4>
+                        <ul class="space-y-1 text-gray-600 mb-4">
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>膳食纤维: 2.7克</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>蛋白质: 3.6克</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>卡路里: 110</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>富含镁、铜、锰和B族维生素</li>
+                        </ul>
+                        
+                        <div class="bg-neutral p-3 rounded-lg">
+                            <p class="text-sm text-gray-700"><i class="fa fa-lightbulb-o text-secondary mr-2"></i>健康益处: 改善血液循环，降低胆固醇，支持心脏健康，有助于控制血糖水平。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 五谷食用建议 -->
+                <div class="bg-gradient-to-br from-amber-700/10 to-amber-800/5 rounded-xl p-6 flex flex-col justify-center">
+                    <h3 class="text-xl font-bold text-dark mb-4 text-center">五谷食用建议</h3>
+                    <p class="text-gray-600 mb-4">如何将五谷更好地融入日常饮食：</p>
+                    <ul class="space-y-3 text-gray-700 mb-6">
+                        <li class="flex items-start">
+                            <i class="fa fa-arrow-right text-amber-700 mt-1 mr-2"></i>
+                            <span>选择全谷物而非精制谷物，以获取更多纤维和营养</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-arrow-right text-amber-700 mt-1 mr-2"></i>
+                            <span>尝试将不同谷物混合烹饪，如糙米与藜麦混合，增加口感和营养</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-arrow-right text-amber-700 mt-1 mr-2"></i>
+                            <span>早餐可以用燕麦或小米煮粥，搭配水果增加风味和营养</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-arrow-right text-amber-700 mt-1 mr-2"></i>
+                            <span>储存五谷时应密封并放在阴凉干燥处，防止虫蛀和变质</span>
+                        </li>
+                    </ul>
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <p class="text-sm text-gray-700"><i class="fa fa-info-circle text-accent mr-2"></i>建议成年人每天摄入6-8份谷物，其中至少一半应为全谷物。一份约等于半杯 cooked grains 或一片面包。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i class="fa fa-leaf text-primary text-2xl"></i>
+                        <span class="font-bold text-xl">健康食品指南</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">提供全面的健康食品信息，帮助您做出更明智的饮食选择，迈向更健康的生活方式。</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors"><i class="fa fa-facebook"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors"><i class="fa fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors"><i class="fa fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors"><i class="fa fa-pinterest"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold text-lg mb-4">快速链接</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-gray-400 hover:text-primary transition-colors">首页</a></li>
+                        <li><a href="vegetarian-protein.html" class="text-gray-400 hover:text-primary transition-colors">素食蛋白</a></li>
+                        <li><a href="fruits.html" class="text-gray-400 hover:text-primary transition-colors">水果</a></li>
+                        <li><a href="grains.html" class="text-gray-400 hover:text-primary transition-colors">五谷</a></li>
+                        <li><a href="vegetables.html" class="text-gray-400 hover:text-primary transition-colors">蔬菜</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold text-lg mb-4">订阅更新</h4>
+                    <p class="text-gray-400 mb-4">订阅我们的 newsletter，获取最新的健康饮食资讯和小贴士。</p>
+                    <form class="flex">
+                        <input type="email" placeholder="您的邮箱地址" class="px-4 py-2 rounded-l-lg w-full focus:outline-none text-dark">
+                        <button type="submit" class="bg-primary hover:bg-primary/90 px-4 py-2 rounded-r-lg transition-colors">
+                            <i class="fa fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500">
+                <p>&copy; 2023 健康食品指南 - 保留所有权利</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('py-2', 'shadow-lg');
+                navbar.classList.remove('py-3', 'shadow-md');
+            } else {
+                navbar.classList.add('py-3', 'shadow-md');
+                navbar.classList.remove('py-2', 'shadow-lg');
+            }
+        });
+        
+        // 移动端菜单切换
+        const menuBtn = document.getElementById('menuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        menuBtn.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+            const icon = menuBtn.querySelector('i');
+            if (mobileMenu.classList.contains('hidden')) {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            } else {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            }
+        });
+        
+        // 五谷营养成分图表
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('grainChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['燕麦', '糙米', '藜麦', '小米', '荞麦'],
+                    datasets: [
+                        {
+                            label: '膳食纤维 (克)',
+                            data: [4, 2.8, 2.8, 2.2, 2.7],
+                            backgroundColor: '#D97706',
+                            borderColor: '#B45309',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '蛋白质 (克)',
+                            data: [5, 2.6, 4.4, 4.8, 3.6],
+                            backgroundColor: '#4CAF50',
+                            borderColor: '#388E3C',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '含量 (克/100克熟重)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.raw + 'g';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+        
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                    
+                    // 如果是移动菜单点击，关闭菜单
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                        const icon = menuBtn.querySelector('i');
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
