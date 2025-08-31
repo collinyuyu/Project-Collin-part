@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康食品指南 - 水果</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4CAF50',
+                        secondary: '#FF9800',
+                        accent: '#2196F3',
+                        neutral: '#f5f5f5',
+                        dark: '#333333'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-dark">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-md fixed w-full z-10 transition-all duration-300" id="navbar">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="index.html" class="flex items-center space-x-2">
+                <i class="fa fa-leaf text-primary text-2xl"></i>
+                <span class="font-bold text-xl text-primary">健康食品指南</span>
+            </a>
+            
+            <!-- 桌面导航 -->
+            <div class="hidden md:flex space-x-6">
+                <a href="index.html" class="font-medium text-gray-600 hover:text-primary transition-colors">首页</a>
+                <a href="vegetarian-protein.html" class="font-medium text-gray-600 hover:text-primary transition-colors">素食蛋白</a>
+                <a href="fruits.html" class="font-medium text-primary hover:text-primary/80 transition-colors">水果</a>
+                <a href="grains.html" class="font-medium text-gray-600 hover:text-primary transition-colors">五谷</a>
+                <a href="vegetables.html" class="font-medium text-gray-600 hover:text-primary transition-colors">蔬菜</a>
+            </div>
+            
+            <!-- 移动端菜单按钮 -->
+            <button class="md:hidden text-gray-600 focus:outline-none" id="menuBtn">
+                <i class="fa fa-bars text-xl"></i>
+            </button>
+        </div>
+        
+        <!-- 移动端导航菜单 -->
+        <div class="md:hidden hidden bg-white shadow-lg absolute w-full" id="mobileMenu">
+            <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
+                <a href="index.html" class="py-2 font-medium text-gray-600 hover:bg-gray-50 hover:text-primary px-2 rounded transition-colors">首页</a>
+                <a href="vegetarian-protein.html" class="py-2 font-medium text-gray-600 hover:bg-gray-50 hover:text-primary px-2 rounded transition-colors">素食蛋白</a>
+                <a href="fruits.html" class="py-2 font-medium text-primary hover:bg-gray-50 px-2 rounded transition-colors">水果</a>
+                <a href="grains.html" class="py-2 font-medium text-gray-600 hover:bg-gray-50 hover:text-primary px-2 rounded transition-colors">五谷</a>
+                <a href="vegetables.html" class="py-2 font-medium text-gray-600 hover:bg-gray-50 hover:text-primary px-2 rounded transition-colors">蔬菜</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主横幅 -->
+    <header class="pt-24 pb-16 bg-gradient-to-br from-secondary/90 to-secondary text-white">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-8 md:mb-0">
+                    <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold mb-4 text-shadow">水果</h1>
+                    <p class="text-[clamp(1rem,2vw,1.25rem)] opacity-90">水果是维生素、矿物质和抗氧化剂的天然来源，富含膳食纤维，有助于维持身体健康。每天食用多种水果可以提供丰富的营养，促进整体健康。</p>
+                </div>
+                <div class="md:w-1/2">
+                    <img src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="各种新鲜水果" class="rounded-xl shadow-lg w-full max-w-lg mx-auto transform -rotate-2 hover:rotate-0 transition-transform duration-300">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="py-16">
+        <div class="container mx-auto px-4">
+            <!-- 营养成分对比图表 -->
+            <section class="mb-16 bg-white rounded-2xl shadow-md p-6 md:p-8">
+                <h2 class="text-2xl font-bold mb-6 text-center">水果维生素C含量对比 (每100克)</h2>
+                <div class="h-80">
+                    <canvas id="fruitChart"></canvas>
+                </div>
+            </section>
+            
+            <!-- 水果列表 -->
+            <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-center mb-12 text-dark">营养丰富的水果</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- 蓝莓 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover">
+                    <div class="h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1594002348772-bc0cb57ade8b?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="蓝莓" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-3">
+                            <i class="fa fa-apple-alt text-secondary text-xl mr-2"></i>
+                            <h3 class="text-xl font-bold text-dark">蓝莓</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">蓝莓是一种小型浆果，呈深蓝色，味道酸甜可口。它们被认为是"超级食物"之一，因为其极高的抗氧化剂含量。</p>
+                        
+                        <h4 class="font-bold text-lg mb-2 text-primary">营养成分</h4>
+                        <ul class="space-y-1 text-gray-600 mb-4">
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>维生素C: 9.7毫克 (11% 每日需求量)</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>膳食纤维: 2.4克</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>卡路里: 57</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>富含花青素和其他抗氧化剂</li>
+                        </ul>
+                        
+                        <div class="bg-neutral p-3 rounded-lg">
+                            <p class="text-sm text-gray-700"><i class="fa fa-lightbulb-o text-secondary mr-2"></i>健康益处: 改善心脏健康，增强记忆力，减少炎症，保护眼睛健康。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 香蕉 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover">
+                    <div class="h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1603833665858-e61d17a86224?q=80&w=627&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="香蕉" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-3">
+                            <i class="fa fa-apple-alt text-secondary text-xl mr-2"></i>
+                            <h3 class="text-xl font-bold text-dark">香蕉</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">香蕉是世界上最受欢迎的水果之一，富含能量，易于携带，是运动前后的理想零食。它们的成熟度不同，味道和质地也有所不同。</p>
+                        
+                        <h4 class="font-bold text-lg mb-2 text-primary">营养成分</h4>
+                        <ul class="space-y-1 text-gray-600 mb-4">
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>钾: 358毫克 (7% 每日需求量)</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>维生素B6: 0.4毫克 (22% 每日需求量)</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>膳食纤维: 2.6克</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>卡路里: 89</li>
+                        </ul>
+                        
+                        <div class="bg-neutral p-3 rounded-lg">
+                            <p class="text-sm text-gray-700"><i class="fa fa-lightbulb-o text-secondary mr-2"></i>健康益处: 维持正常血压，提供快速能量，支持消化系统健康，有助于肌肉功能。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 苹果 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover">
+                    <div class="h-56 overflow-hidden">
+                        <img src="https://plus.unsplash.com/premium_photo-1667049292983-d2524dd0ef08?q=80&w=1698&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="苹果" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-3">
+                            <i class="fa fa-apple-alt text-secondary text-xl mr-2"></i>
+                            <h3 class="text-xl font-bold text-dark">苹果</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">苹果是最广泛种植的水果之一，有许多品种，从甜到酸不等。"一天一苹果，医生远离我"这句谚语反映了它的健康价值。</p>
+                        
+                        <h4 class="font-bold text-lg mb-2 text-primary">营养成分</h4>
+                        <ul class="space-y-1 text-gray-600 mb-4">
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>维生素C: 4.6毫克 (5% 每日需求量)</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>膳食纤维: 2.4克 (主要在果皮中)</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>卡路里: 52</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>富含抗氧化剂和植物化合物</li>
+                        </ul>
+                        
+                        <div class="bg-neutral p-3 rounded-lg">
+                            <p class="text-sm text-gray-700"><i class="fa fa-lightbulb-o text-secondary mr-2"></i>健康益处: 降低心脏病风险，帮助体重管理，支持肠道健康，具有抗炎特性。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 橙子 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover">
+                    <div class="h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="橙子" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-3">
+                            <i class="fa fa-apple-alt text-secondary text-xl mr-2"></i>
+                            <h3 class="text-xl font-bold text-dark">橙子</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">橙子是柑橘类水果的代表，以其甜美多汁的果肉和丰富的维生素C而闻名。它们通常在冬季成熟，是寒冷季节的营养佳品。</p>
+                        
+                        <h4 class="font-bold text-lg mb-2 text-primary">营养成分</h4>
+                        <ul class="space-y-1 text-gray-600 mb-4">
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>维生素C: 53.2毫克 (59% 每日需求量)</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>膳食纤维: 2.4克</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>卡路里: 47</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>富含类黄酮和抗氧化剂</li>
+                        </ul>
+                        
+                        <div class="bg-neutral p-3 rounded-lg">
+                            <p class="text-sm text-gray-700"><i class="fa fa-lightbulb-o text-secondary mr-2"></i>健康益处: 增强免疫系统，促进胶原蛋白生成，改善铁吸收，支持心脏健康。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 草莓 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover">
+                    <div class="h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1587393855524-087f83d95bc9?q=80&w=920&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="草莓" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-3">
+                            <i class="fa fa-apple-alt text-secondary text-xl mr-2"></i>
+                            <h3 class="text-xl font-bold text-dark">草莓</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">草莓是一种受欢迎的浆果，具有鲜艳的红色、独特的心形和甜美的味道。它们实际上不是浆果，而是聚合果，每个"种子"都是一个单独的果实。</p>
+                        
+                        <h4 class="font-bold text-lg mb-2 text-primary">营养成分</h4>
+                        <ul class="space-y-1 text-gray-600 mb-4">
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>维生素C: 58.8毫克 (65% 每日需求量)</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>膳食纤维: 2克</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>卡路里: 32</li>
+                            <li><i class="fa fa-check-circle text-primary mr-2"></i>富含锰和抗氧化剂</li>
+                        </ul>
+                        
+                        <div class="bg-neutral p-3 rounded-lg">
+                            <p class="text-sm text-gray-700"><i class="fa fa-lightbulb-o text-secondary mr-2"></i>健康益处: 减少炎症，改善心脏健康，有助于血糖管理，促进皮肤健康。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 水果食用建议 -->
+                <div class="bg-gradient-to-br from-secondary/10 to-secondary/5 rounded-xl p-6 flex flex-col justify-center">
+                    <h3 class="text-xl font-bold text-dark mb-4 text-center">水果食用建议</h3>
+                    <p class="text-gray-600 mb-4">如何最大化水果的营养价值：</p>
+                    <ul class="space-y-3 text-gray-700 mb-6">
+                        <li class="flex items-start">
+                            <i class="fa fa-arrow-right text-secondary mt-1 mr-2"></i>
+                            <span>尽量选择当季水果，它们更新鲜，营养更丰富，价格也更实惠</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-arrow-right text-secondary mt-1 mr-2"></i>
+                            <span>大多数水果最好连皮吃，因为果皮中含有大量纤维和抗氧化剂</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-arrow-right text-secondary mt-1 mr-2"></i>
+                            <span>每天食用2-3份不同种类的水果，以获得多样化的营养</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-arrow-right text-secondary mt-1 mr-2"></i>
+                            <span>整果比果汁更健康，因为保留了所有的纤维和营养</span>
+                        </li>
+                    </ul>
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <p class="text-sm text-gray-700"><i class="fa fa-info-circle text-accent mr-2"></i>一份水果大约相当于一个中等大小的水果（如苹果或橙子），或半杯切碎的水果。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i class="fa fa-leaf text-primary text-2xl"></i>
+                        <span class="font-bold text-xl">健康食品指南</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">提供全面的健康食品信息，帮助您做出更明智的饮食选择，迈向更健康的生活方式。</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors"><i class="fa fa-facebook"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors"><i class="fa fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors"><i class="fa fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors"><i class="fa fa-pinterest"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold text-lg mb-4">快速链接</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-gray-400 hover:text-primary transition-colors">首页</a></li>
+                        <li><a href="vegetarian-protein.html" class="text-gray-400 hover:text-primary transition-colors">素食蛋白</a></li>
+                        <li><a href="fruits.html" class="text-gray-400 hover:text-primary transition-colors">水果</a></li>
+                        <li><a href="grains.html" class="text-gray-400 hover:text-primary transition-colors">五谷</a></li>
+                        <li><a href="vegetables.html" class="text-gray-400 hover:text-primary transition-colors">蔬菜</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold text-lg mb-4">订阅更新</h4>
+                    <p class="text-gray-400 mb-4">订阅我们的 newsletter，获取最新的健康饮食资讯和小贴士。</p>
+                    <form class="flex">
+                        <input type="email" placeholder="您的邮箱地址" class="px-4 py-2 rounded-l-lg w-full focus:outline-none text-dark">
+                        <button type="submit" class="bg-primary hover:bg-primary/90 px-4 py-2 rounded-r-lg transition-colors">
+                            <i class="fa fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500">
+                <p>&copy; 2023 健康食品指南 - 保留所有权利</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('py-2', 'shadow-lg');
+                navbar.classList.remove('py-3', 'shadow-md');
+            } else {
+                navbar.classList.add('py-3', 'shadow-md');
+                navbar.classList.remove('py-2', 'shadow-lg');
+            }
+        });
+        
+        // 移动端菜单切换
+        const menuBtn = document.getElementById('menuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        menuBtn.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+            const icon = menuBtn.querySelector('i');
+            if (mobileMenu.classList.contains('hidden')) {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            } else {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            }
+        });
+        
+        // 水果营养成分图表
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('fruitChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['蓝莓', '香蕉', '苹果', '橙子', '草莓'],
+                    datasets: [
+                        {
+                            label: '维生素C (毫克)',
+                            data: [9.7, 8.7, 4.6, 53.2, 58.8],
+                            backgroundColor: '#FF9800',
+                            borderColor: '#F57C00',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '膳食纤维 (克)',
+                            data: [2.4, 2.6, 2.4, 2.4, 2],
+                            backgroundColor: '#4CAF50',
+                            borderColor: '#388E3C',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '含量 (每100克)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.datasetIndex === 0) {
+                                        label += context.raw + 'mg';
+                                    } else {
+                                        label += context.raw + 'g';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+        
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                    
+                    // 如果是移动菜单点击，关闭菜单
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                        const icon = menuBtn.querySelector('i');
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
